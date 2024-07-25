@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.finalproject.mapper.BoardMapper">
+
+    <!-- BoardDTO에 해당하는 resultMap -->
+    <resultMap type="com.finalproject.dto.BoardDTO" id="board">
+        <id column="BOARD_NO" property="boardNo"/>
+        <result column="BOARD_TITLE" property="boardTitle"/>
+        <result column="BOARD_CONTENT" property="boardContent"/>
+        <result column="BOARD_COUNT" property="boardCount"/>
+        <result column="BOARD_WRITE_DATE" property="boardWriteDate"/>
+        <result column="BOARD_UPDATE_DATE" property="boardUpdateDate"/>
+        <result column="USER_ID" property="userId"/>
+        <result column="CATEGORIE_NO" property="categorieNo"/>
+        <result column="BOARD_LIKE" property="boardLike"/>
+        <result column="BOARD_HATE" property="boardHate"/>
+    </resultMap>
+    
+    <resultMap type="com.finalproject.dto.CommentDTO" id="comment">
+        <id column="COMMENT_NO" property="commentNo"/>
+	    <result column="COMMENT_CONTENT" property="commentContent"/>
+	    <result column="COMMENT_WRITE_DATE" property="commentWriteDate"/>
+	    <result column="USER_ID" property="userId"/>
+	    <result column="BOARD_NO" property="boardNo"/>
+	    <result column="COMMENT_LIKE" property="commentLike"/>
+	    <result column="COMMENT_HATE" property="commentHate"/>
+    </resultMap>
+
+    <!-- Sample SQL Queries -->
+
+    
+    <!-- vo사용을 위한 전체 게시글 수 조회 -->
+    <select id="selectBoardTotalCount">
+		SELECT COUNT(*) FROM BOARD_VIEW
+	</select>
+	
+	<!-- 전체 게시글 조회 -->	
+	<select id="selectBoardList" parameterType="map" resultMap="board">
+		SELECT * FROM
+		(SELECT CEIL(ROW_NUMBER() OVER(ORDER BY B.BOARD_NO DESC) / #{pageContentCount}) AS PAGE_NO,
+		B.* FROM BOARD_VIEW B) WHERE PAGE_NO = #{pageNo}
+	</select>
+	
+	<!-- ==================== 게시글 관련 ==================== -->
+	
+	<!-- 게시글 상세조회 -->
+	<select id="selectBoard" parameterType="int" resultMap="board">
+		select * from board_view where board_no = #{bno}
+	</select>
+	
+	<!-- 게시글 댓글 조회 -->
+	<select id="selectCommentList" parameterType="int" resultMap="comment">
+		SELECT * FROM COMMENT_VIEW 
+		WHERE BOARD_NO = #{bno}
+		ORDER BY COMMENT_NO DESC
+	</select>
+	
+	<!-- 게시글 조회수 증가 -->
+	<update id="updateBoardCount" parameterType="int">
+		update board set board_count = board_count + 1
+		where board_no = #{bno}
+	</update>
+	
+	
+	<!-- 게시글 좋아요/싫어요 -->
+	<insert id="insertBoardLike" parameterType="map">
+    insert into board_like values(#{id},#{bno})
+	</insert>
+	<delete id="deleteBoardLike" parameterType="map">
+	    delete from board_like where user_id = #{id} and board_no = #{bno}
+	</delete>
+	<select id="selectBoardLikeCount" parameterType="int">
+	    select count(*) from board_like where board_no = #{bno}
+	</select>
+	<insert id="insertBoardHate" parameterType="map">
+	    insert into board_hate values(#{id},#{bno})
+	</insert>
+	<delete id="deleteBoardHate" parameterType="map">
+	    delete from board_hate where user_id = #{id} and board_no = #{bno}
+	</delete>
+	<select id="selectBoardHateCount" parameterType="int">
+	    select count(*) from board_hate where board_no = #{bno}
+	</select>
+
+
+	<!-- 댓글 좋아요/싫어요 -->
+    <insert id="insertCommentLike" parameterType="map">
+        insert into comment_like values (#{userId}, #{cno})
+    </insert>
+    <delete id="deleteCommentLike" parameterType="map">
+        delete from comment_like where user_id = #{userId} and comment_no = #{cno}
+    </delete>
+    <select id="selectCommentLikeCount" parameterType="int">
+        select count(*) from comment_like where comment_no = #{cno}
+    </select>
+    <insert id="insertCommentHate" parameterType="map">
+        insert into comment_hate values (#{userId}, #{cno})
+    </insert>
+    <delete id="deleteCommentHate" parameterType="map">
+        delete from comment_hate where user_id = #{userId} and comment_no = #{cno}
+    </delete>
+    <select id="selectCommentHateCount" parameterType="int">
+        select count(*) from comment_hate where comment_no = #{cno}
+    </select>
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	<!-- ==================== 게시글 관련 ==================== -->
+    
+</mapper>
+
+
+

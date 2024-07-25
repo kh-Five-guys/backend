@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.finalproject.mapper.UserMapper">
+	<!-- UserDTO에 해당하는 resultMap -->
+	<resultMap type="com.finalproject.dto.UserDTO" id="user">
+		<id column="USER_ID" property="userId" />
+		<result column="USER_EMAIL" property="userEmail" />
+		<result column="USER_PASSWD" property="userPasswd" />
+		<result column="USER_NICK" property="userNick" />
+		<result column="USER_ADDRESS" property="userAddress" />
+		<result column="LATITUDE" property="latitude" />
+		<result column="LONGITUDE" property="longitude" />
+		<result column="RANK_NO" property="rankNo" />
+		<result column="USER_PRO_IMG" property="userProImg"
+			jdbcType="BLOB" />
+	</resultMap>
+
+	<!-- 로그인 -->
+	<select id="login" parameterType="map" resultMap="user">
+		SELECT * FROM users
+		WHERE user_id = #{id}
+		AND user_passwd = STANDARD_HASH(#{pass}, 'SHA512')
+	</select>
+
+	<!-- 회원가입 -->
+	<insert id="insertUser"
+		parameterType="com.finalproject.dto.UserDTO">
+		INSERT INTO users (USER_ID, USER_EMAIL, USER_PASSWD, USER_NICK,
+		USER_ADDRESS, USER_PRO_IMG)
+		VALUES (#{userId}, #{userEmail}, STANDARD_HASH(#{userPasswd}, 'SHA512'),
+		#{userNick}, #{userAddress}, #{userProImg})
+	</insert>
+
+	<!-- 프로필 업데이트 -->
+	<update id="updateUser"
+		parameterType="com.finalproject.dto.UserDTO">
+		UPDATE users
+		SET user_nick = #{userNick},
+		user_passwd = STANDARD_HASH(#{userPasswd}, 'SHA512'),
+		user_address = #{userAddress},
+		user_pro_img = #{userProImg}
+		WHERE user_id = #{userId}
+	</update>
+
+	<select id="getAllUsers" resultMap="user">
+		SELECT * FROM users
+	</select>
+	
+	<delete id="deleteUser" parameterType="string">
+        DELETE FROM Users WHERE user_Id=#{userId}
+    </delete>
+
+    <update id="updateUserRank" parameterType="map">
+        UPDATE Users SET rank_no=#{rankNo} WHERE user_Id=#{userId}
+    </update>
+    
+</mapper>
