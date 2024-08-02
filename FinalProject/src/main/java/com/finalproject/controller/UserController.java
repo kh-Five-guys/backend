@@ -43,6 +43,7 @@ public class UserController {
     @PostMapping("/members/{userId}/rank")
     public ResponseEntity<String> updateUserRank(@PathVariable String userId, @RequestBody Map<String, Integer> rankData) {
         int newRankNo = rankData.get("rankNo");
+        System.out.println(newRankNo);
         int result = service.updateUserRank(userId, newRankNo);
         if (result > 0) {
             return ResponseEntity.ok("회원 등급 변경 완료");
